@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI News — AITXT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-hover: #2d3748;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --border: #334155;
+    --source-bg: #1e1b4b;
+    --source-border: #4f46e5;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(8px);
+  }
+
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .logo .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent); }
+
+  h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+  h1 span { color: var(--accent); }
+
+  .subtitle { color: var(--muted); font-size: 0.875rem; margin-top: 0.25rem; }
+
+  /* Main */
+  main { max-width: 1000px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+
+  .intro {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Loading / error states */
+  #loading, #error {
+    display: none;
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+  }
+  #error { color: #f87171; }
+
+  /* Content rendering */
+  .article {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .article:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px -1px rgba(56, 189, 248, 0.15);
+  }
+
+  .article h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .article h2::before { content: ""; width: 3px; height: 1.25rem; background: var(--accent); border-radius: 2px; }
+
+  .article h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  .article p {
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    opacity: 0.95;
+  }
+
+  .article p strong { color: var(--accent-hover); }
+
+  .article ul, .article ol {
+    margin: 0.5rem 0 0.75rem 1.5rem;
+    color: var(--text);
+    opacity: 0.95;
+  }
+  .article li { margin-bottom: 0.35rem; }
+
+  .why {
+    background: rgba(56, 189, 248, 0.08);
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+  }
+  .why strong { color: var(--accent); }
+
+  .source {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .source a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent); }
+  .source a:hover { color: var(--accent-hover); border-bottom-style: solid; }
+
+  .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    main { padding: 2rem 1rem 4rem; }
+    .article { padding: 1.5rem; }
+    header { padding: 1rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo"><div class="dot"></div> AITXT</div>
+    <div>
+      <h1>AI News <span>Roundup</span></h1>
+      <div class="subtitle">Live feed from <code style="background:rgba(56,189,248,0.15);padding:0.1rem 0.4rem;border-radius:4px;">AITXT</code> &bull; Updated November 2026</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="intro" id="intro">
+    <p>Loading latest AI news from AITXT&hellip;</p>
+  </div>
+  <div id="loading" role="status" aria-label="Loading">Loading news&hellip;</div>
+  <div id="error">Failed to load AITXT. Please check the file is present in the repository.</div>
+  <div id="content"></div>
+</main>
+
+<footer>
+  &nbsp; Generated from AITXT &bull; Sources: ETA &bull; Google AI Blog &bull; Emergent
+  <br>
+  <a href="https://github.com" target="_blank" rel="noopener">View on GitHub</a> &bull; <a href="AITXT" target="_blank">Open raw AITXT</a>
+</footer>
+
+<script>
+(async function () {
+  const intro = document.getElementById('intro');
+  const loading = document.getElementById('loading');
+  const error = document.getElementById('error');
+  const content = document.getElementById('content');
+
+  try {
+    const res = await fetch('AITXT', { cache: 'no-store' });
+    if (!res.ok) throw new Error('AITXT not found');
+    const text = await res.text();
+
+    intro.style.display = 'none';
+    loading.style.display = 'none';
+    content.style.display = 'block';
+
+    render(content, text);
+  } catch (e) {
+    intro.style.display = 'none';
+    loading.style.display = 'none';
+    error.style.display = 'block';
+    console.error(e);
+  }
+})();
+
+function render(container, text) {
+  // Split into logical blocks separated by blank lines
+  const blocks = text.split(/\n{2,}/).filter(b => b.trim());
+
+  blocks.forEach(block => {
+    const trimmed = block.trim();
+    const el = document.createElement('div');
+
+    // Detect source headers
+    if (trimmed.startsWith('SOURCE ') && trimmed.includes('http')) {
+      el.className = 'article';
+      const m = trimmed.match(/^(SOURCE \d+[^\n]*)\n(https?:\/\/[^\n]+)/);
+      const title = m ? m[1] : trimmed.split('\n')[0];
+      const url = m ? m[2] : '';
+      el.innerHTML = `
+        <div class="source">Source: <a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(url)}</a></div>
+        <h2>${escapeHtml(title)}</h2>
+        <div class="meta">Gathered from public AI news sources &bull; November 2026</div>
+        <div class="body">${formatBody(trimmed)}</div>
+      `;
+      container.appendChild(el);
+      return;
+    }
+
+    // Detect titled sections (ALL CAPS heading followed by details)
+    const lines = trimmed.split('\n');
+    const firstLine = lines[0];
+
+    // Treat short ALL-CAPS lines as section headers within an article
+    if (lines.length > 1 && /^[A-Z][A-Z &'.,()-]{3,}$/.test(firstLine) && firstLine.length < 60) {
+      el.className = 'article';
+      el.innerHTML = `<h2>${escapeHtml(firstLine)}</h2><div class="body">${formatBody(lines.slice(1).join('\n'))}</div>`;
+      container.appendChild(el);
+      return;
+    }
+
+    // Default: generic article block
+    el.className = 'article';
+    el.innerHTML = `<div class="body">${formatBody(trimmed)}</div>`;
+    container.appendChild(el);
+  });
+}
+
+function formatBody(text) {
+  // Convert "Why it matters:" lines into callout boxes
+  text = text.replace(
+    /(Why it matters:[\s\S]*?)(?=\n\n|\n[A-Z][a-z]+ |\n[A-Z ]{3,}|\n(?:SOURCE|\d+\.)|$)/g,
+    '<div class="why">$1</div>'
+  );
+
+  // Bold lines that look like section labels ending in colon
+  text = text.replace(/^([A-Z][A-Za-z ,()&'\/:-]{4,}:)(\s)/gm, '<strong>$1</strong>$2');
+
+  // Simple bullet conversion
+  text = text.replace(/^\s*[-•]\s+/gm, '<li>');
+  text = text.replace(/<li>([^<]*)/g, '<li>$1</li>');
+
+  // Wrap paragraphs
+  const paragraphs = text.split(/\n+/).map(p => {
+    p = p.trim();
+    if (!p) return '';
+    if (p.startsWith('<li>') || p.startsWith('<div') || p.startsWith('<strong>') && !p.includes('<li>') === false) return p;
+    return '<p>' + escapeHtmlLinks(p) + '</p>';
+    // note: we handle escaping carefully below
+  }).join('');
+
+  return paragraphs;
+}
+
+// Escape HTML but keep <li>, <strong>, <div>, <p> tags we just inserted
+function escapeHtmlLinks(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/&lt;li&gt;/g, '<li>')
+    .replace(/&lt;\/li&gt;/g, '</li>')
+    .replace(/&lt;strong&gt;/g, '<strong>')
+    .replace(/&lt;\/strong&gt;/g, '</strong>')
+    .replace(/&lt;div class="why"&gt;/g, '<div class="why">')
+    .replace(/&lt;\/div&gt;/g, '</div>')
+    .replace(/&lt;p&gt;/g, '<p>')
+    .replace(/&lt;\/p&gt;/g, '</p>');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
+}
+</script>
+
+</body>
+</html>
